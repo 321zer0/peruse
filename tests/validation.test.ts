@@ -14,4 +14,16 @@ describe("validateCommentRequest", () => {
 
         expect(validateCommentRequest(request)).toBeNull();
     });
+
+    it("rejects an empty slug", () => {
+        const request = {
+            slug: "",
+            name: "Alice",
+            email: "alice@website.com",
+            replyTo: "",
+            comment: "Nice blog :)"
+        };
+
+        expect(validateCommentRequest(request)).not.toBeNull();
+    });
 });
