@@ -6,7 +6,13 @@ export interface GitHubCommitResult {
     error: string | null;
 }
 
-export async function createCommit(request: CommentRequest, data: CommentData): Promise<GitHubCommitResult> {
+export interface GitHubConfig {
+    owner: string;
+    repositoryName: string;
+    dataPath: string;
+}
+
+export async function createCommit(request: CommentRequest, data: CommentData, config: GitHubConfig): Promise<GitHubCommitResult> {
     const body = {
         message: "New comment in " + request.slug + " by " + request.name,
         committer: {
@@ -26,16 +32,11 @@ export async function createCommit(request: CommentRequest, data: CommentData): 
         body: JSON.stringify(body)
     };
 
-    // User-defined data
-    const repoOwner = "321zer0";
-    const repoName = "techblog";
-    const dataPath = "data/comments"
-
     // TODO: Add logic to remove any leading and trailing slashes from repoPath to be safe
 
     const filename = "comment-" + Date.now() + ".json";
-    const endpointBase = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
-    const endpoint = `${endpointBase}/${dataPath}/${request.slug}/${filename}`;
+    const endpointBase = `https://api.github.com/repos/${config.owner}/${config.repositoryName}/contents`;
+    const endpoint = `${endpointBase}/${config.dataPath}/${request.slug}/${filename}`;
 
     let response: Response;
 

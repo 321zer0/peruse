@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import type { CommentRequest } from './types.js';
 import { createComment } from './service.js';
+import type { GitHubConfig } from './github.js';
 
 
 // Initialize express app
@@ -36,7 +37,13 @@ router.post('/post', async (req, res) => {
     const errMsg = "There was an error processing your request. Please try again later.";
     const successMsg = "Thank you! Your comment has been received and will be published shortly :)";
 
-    const commentResult = await createComment(commentRequest);
+    const githubConfig: GitHubConfig = {
+        owner: "321zer0",
+        repositoryName: "techblog",
+        dataPath: "data/comments"
+    };
+
+    const commentResult = await createComment(commentRequest, githubConfig);
     
     const msg = commentResult.success 
         ? successMsg 
