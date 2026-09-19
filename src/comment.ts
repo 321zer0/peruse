@@ -37,9 +37,16 @@ router.post('/post', async (req, res) => {
     const errMsg = "There was an error processing your request. Please try again later.";
     const successMsg = "Thank you! Your comment has been received and will be published shortly :)";
 
+    const owner = process.env.GITHUB_COMMENT_OWNER;
+    const repositoryName = process.env.GITHUB_COMMENT_REPO;
+
+    if (!owner || !repositoryName) {
+        throw new Error("Error: GitHub comment configuration is missing");
+    }
+
     const githubConfig: GitHubConfig = {
-        owner: "321zer0",
-        repositoryName: "techblog",
+        owner: owner,
+        repositoryName: repositoryName,
         dataPath: "data/comments"
     };
 
