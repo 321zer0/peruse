@@ -15,3 +15,9 @@ export interface CommentData {
     comment: string;
     date: string;
 }
+
+export interface CommentResult {
+    success: boolean;
+    statusCode: number;
+    error: string | null;
+}
