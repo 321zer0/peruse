@@ -1,10 +1,10 @@
 import type { CommentRequest, CommentResult, CommentData } from "./types.js";
 import { validateCommentRequest } from './validation.js';
-import { createCommit } from './github.js';
+import { createCommit, GitHubConfig } from './github.js';
 import { v6 as uuidv6 } from 'uuid';
 import { createHash } from 'crypto';
 
-export async function createComment(request: CommentRequest): Promise<CommentResult> {
+export async function createComment(request: CommentRequest, config: GitHubConfig): Promise<CommentResult> {
     const validationError = validateCommentRequest(request);
 
     if (validationError !== null) {
@@ -25,7 +25,7 @@ export async function createComment(request: CommentRequest): Promise<CommentRes
         date: new Date().toISOString(),
     };
 
-    const commitResult = await createCommit(request, commentData);
+    const commitResult = await createCommit(request, commentData, config);
 
     return {
         success: commitResult.success,
