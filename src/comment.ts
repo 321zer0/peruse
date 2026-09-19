@@ -113,17 +113,18 @@ router.post('/post', async (req, res) => {
     const errMsg = "Error processing your request. Please try again later.";
     const successMsg = "Thank you! Your comment has been received and will be published shortly :)";
 
-    let statusCode = "";
+    let statusCode = 0;
     let msg = "";
 
     const response = await fetch(endpoint, opts)
     .catch((error) => {
         statusCode = 500;
         msg = errMsg + " " + error.statusText;
+        return null;
     });
 
     // Send response in case of exception in the above fetch request
-    if (statusCode !== "")
+    if (response === null)
     {
         let result = { statusCode: statusCode, msg: msg }
         return res.send(JSON.stringify(result));
@@ -133,7 +134,7 @@ router.post('/post', async (req, res) => {
     {
         // If success, GitHub API returns an object with "content" and "commit" properties.
         // On failure, GitHub API returns an object with "status" property.
-        const data = await response.json();
+        const data = await response.json() as any;
         statusCode = Object.hasOwn(data, 'commit') ? 200 : 422;
         msg = Object.hasOwn(data, 'commit') ? successMsg : errMsg;
 
