@@ -4,6 +4,8 @@ import cors from 'cors'
 import fetch from 'node-fetch'
 import { v6 as uuidv6 } from 'uuid';
 import { createHash } from 'crypto';
+import { CommentRequest } from './types.js';
+import { validateCommentRequest } from './validation.js';
 
 // Initialize express app
 const app = express()
@@ -31,51 +33,20 @@ router.post('/post', async (req, res) => {
     const replyTo = req.body.replyTo ?? "";
     const comment = req.body.comment ?? "";
 
-    if (slug.trim() === "")
-    {
-        let result = { statusCode: 422, msg: `Error: slug cannot be empty.` }
+    const commentRequest: CommentRequest = {
+        slug: slug,
+        name: name,
+        email: email,
+        replyTo: replyTo,
+        comment: comment
+    };
+
+    const validationError = validateCommentRequest(commentRequest);
+
+    if (validationError !== null) {
+        const result = { statusCode: 422, msg: validationError }
         return res.send(JSON.stringify(result));
     }
-
-    if (name.trim() === "")
-    {
-        let result = { statusCode: 422, msg: "Error: name cannot be empty." }
-        return res.send(JSON.stringify(result));
-    }
-
-    if (email.trim() === "")
-    {
-        let result = { statusCode: 422, msg: "Error: email cannot be empty." }
-        return res.send(JSON.stringify(result));
-    }
-
-    if (comment.trim() === "")
-    {
-        let result = { statusCode: 422, msg: "Error: comment cannot be empty." }
-        return res.send(JSON.stringify(result));
-    }
-
-    // TODO: Validate slug (Directory should exist under /contents/posts)
-
-    // TODO: Validate name (Alphabet only)
-
-    // Validate name (Max 25 chars)
-    if (name.length > 25)
-    {
-        let result = { statusCode: 422, msg: "Error: name cannot be more than 25 characters." }
-        return res.send(JSON.stringify(result));
-    }
-
-    // Validate email (Max 60 chars)
-    if (email.length > 60)
-    {
-        let result = { statusCode: 422, msg: "Error: email cannot be more than 60 characters." }
-        return res.send(JSON.stringify(result));
-    }
-
-    // TODO: Validate email (Alphanumeric OR . OR @, Start and end with alphabet only, contain @ character only once, contain at least one period)
-    // TODO: Validate reply_to (should be a valid _id which exists in a file under /contents/data/comments/slug)
-    // TODO: Sanitize comment (Use HTMLEncode to prevent embedding external content)
 
     const commentData = {
         _id: uuidv6(),
