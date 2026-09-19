@@ -1,11 +1,11 @@
 import serverless from 'serverless-http'
 import express from 'express'
 import cors from 'cors'
-import fetch from 'node-fetch'
 import { v6 as uuidv6 } from 'uuid';
 import { createHash } from 'crypto';
-import { CommentRequest } from './types.js';
+import type { CommentData, CommentRequest } from './types.js';
 import { validateCommentRequest } from './validation.js';
+import { createCommit } from './github.js';
 
 // Initialize express app
 const app = express()
@@ -48,7 +48,7 @@ router.post('/post', async (req, res) => {
         return res.send(JSON.stringify(result));
     }
 
-    const commentData = {
+    const commentData: CommentData = {
         _id: uuidv6(),
         name: name,
         email: createHash('md5').update(email).digest('hex'),
@@ -58,69 +58,16 @@ router.post('/post', async (req, res) => {
         date: new Date().toISOString(),
     };
 
-    const body = {
-        message: "New comment in " + slug + " by " + name,
-        comitter: {
-            name: "Monalisa Octocat",
-            email: "octocat@github.com"
-        },
-        content: btoa(JSON.stringify(commentData))
-    };
+    const commitResult = await createCommit(commentRequest, commentData);
 
-    const opts = {
-        method: "PUT",
-        headers: {
-            "Authorization": "Bearer " + process.env.GITHUB_COMMENT_PAT,
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28"
-        },
-        body: JSON.stringify(body)
-    };
-
-    const filename = "comment-" + Date.now() + ".json";
-    const endpoint_base = "https://api.github.com/repos/321zer0/techblog/contents/data/comments";
-    const endpoint = endpoint_base + "/" + slug + "/" + filename;
-    
-    const errMsg = "Error processing your request. Please try again later.";
+    const errMsg = "There was an error processing your request. Please try again later.";
     const successMsg = "Thank you! Your comment has been received and will be published shortly :)";
+    
+    const msg = commitResult.success 
+        ? successMsg 
+        : (commitResult.error ?? errMsg);
 
-    let statusCode = 0;
-    let msg = "";
-
-    const response = await fetch(endpoint, opts)
-    .catch((error) => {
-        statusCode = 500;
-        msg = errMsg + " " + error.statusText;
-        return null;
-    });
-
-    // Send response in case of exception in the above fetch request
-    if (response === null)
-    {
-        let result = { statusCode: statusCode, msg: msg }
-        return res.send(JSON.stringify(result));
-    }
-
-    if (response.ok)
-    {
-        // If success, GitHub API returns an object with "content" and "commit" properties.
-        // On failure, GitHub API returns an object with "status" property.
-        const data = await response.json() as any;
-        statusCode = Object.hasOwn(data, 'commit') ? 200 : 422;
-        msg = Object.hasOwn(data, 'commit') ? successMsg : errMsg;
-
-        if (statusCode >= 400)
-        {
-            msg = Object.hasOwn(data, 'status') ? data.status : errMsg;
-        }
-    }
-    else
-    {
-        statusCode = response.status;
-        msg = "Error: Failed to contact API. Please try again later.";
-    }
-
-    let result = { statusCode: statusCode, msg: msg }
+    const result = { statusCode: commitResult.statusCode, msg: msg }
     return res.send(JSON.stringify(result));
 })
 

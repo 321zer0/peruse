@@ -5,3 +5,13 @@ export interface CommentRequest {
     replyTo: string;
     comment: string;
 }
+
+export interface CommentData {
+    _id: string;
+    name: string;
+    email: string;
+    email_real: string;
+    reply_to: string;
+    comment: string;
+    date: string;
+}
