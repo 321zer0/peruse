@@ -27,6 +27,9 @@
     "url": "https://github.com/321zer0/peruse/issues"
   },
   "homepage": "https://github.com/321zer0/peruse#readme",
+  "files": [
+    "dist"
+  ],
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
