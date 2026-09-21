@@ -1,7 +1,7 @@
 {
-  "name": "peruse",
+  "name": "@321zer0/peruse",
   "version": "0.1.0",
-  "description": "",
+  "description": "A TypeScript library for adding GitHub-backed comments to static websites.",
   "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js"
@@ -10,9 +10,23 @@
     "build": "tsc",
     "test": "vitest run"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "comments",
+    "commenting",
+    "github",
+    "hugo",
+    "typescript"
+  ],
+  "author": "Muzaffar Rayyan Auhammud",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/321zer0/peruse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/321zer0/peruse/issues"
+  },
+  "homepage": "https://github.com/321zer0/peruse#readme",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
