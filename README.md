@@ -20,7 +20,7 @@ The project currently provides:
 ## Installation
 
 ```bash
-pnpm add @321er0/peruse
+pnpm add @321zer0/peruse
 ```
 
 ## Usage
@@ -32,7 +32,7 @@ import {
     createComment,
     type CommentRequest,
     type GitHubConfig
-} from "@321er0/peruse";
+} from "@321zer0/peruse";
 
 const commentRequest: CommentRequest = {
     slug: req.body.slug ?? "",
